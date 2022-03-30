@@ -3,6 +3,7 @@ package com.finki.sparql_tool_web_app.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -19,13 +20,24 @@ public class Query {
 
     @ManyToOne
     private Endpoint endpoint;
+    @ManyToOne
+    private User user;
+
+    private LocalDateTime timestamp;
+
+    private Long queryResultId;
+
+    private String uniqueUrl;
 
     public Query() {
     }
 
-    public Query(String name, String content, Endpoint endpoint) {
+    public Query(String name, String content, Endpoint endpoint, User user, LocalDateTime timestamp) {
         this.name = name;
         this.content = content;
         this.endpoint=endpoint;
+        this.user = user;
+        this.timestamp=timestamp;
     }
+
 }
