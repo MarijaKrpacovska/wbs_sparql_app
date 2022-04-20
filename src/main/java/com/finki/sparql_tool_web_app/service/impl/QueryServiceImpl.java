@@ -15,7 +15,10 @@ import com.finki.sparql_tool_web_app.service.ResultService;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.LiteralImpl;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.springframework.stereotype.Service;
@@ -75,23 +78,35 @@ public class QueryServiceImpl implements QueryService {
     public List<String> save(QueryDto queryDto) {
         Endpoint endpoint = endpointRepository.findById(queryDto.getEndpointId()).orElseThrow(() -> new EndpointNotFoundException(queryDto.getEndpointId()));
         User user = userRepository.findByEmail(queryDto.getUserEmail());
-        List<String> list = new ArrayList();
 
-
-
-      //  String prefix = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>";
+        //  String prefix = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>";
         Query query = new Query(queryDto.getName(),
                 queryDto.getContent(),
                 endpoint,
                 user,
                 LocalDateTime.now());
 
+        Query savedQuery = queryRepository.save(query);
+
+        List<String> list = this.getResult(savedQuery);
+
+        Result res = this.createResult(list,query).orElseThrow();
+        query.setQueryResultId(res.getId());
+        query.setUniqueUrl("http://localhost:8090/api/queries/details/"+query.getId());
+        queryRepository.save(query);
+
+        return list;
+    }
+
+    public List<String> getResult(Query query){
+        Endpoint endpoint = query.getEndpoint();
+        List<String> list = new ArrayList();
         RDFConnection conn = RDFConnectionFactory.connect(endpoint.getUrl());
 
-        String subjectString = queryDto.getContent().split("\\?")[1].split(" ")[0];
+        String subjectString = query.getContent().split("\\?")[1].split(" ")[0];
         System.out.println("SUBJECT STRING" + subjectString);
 
-        QueryExecution qExec = conn.query(queryDto.getContent()) ; //SELECT DISTINCT ?s where { [] a ?s } LIMIT 100
+        QueryExecution qExec = conn.query(query.getContent()) ; //SELECT DISTINCT ?s where { [] a ?s } LIMIT 100
 
         ResultSet rs = qExec.execSelect() ;
         /*qExec.close() ;
@@ -100,21 +115,26 @@ public class QueryServiceImpl implements QueryService {
 
             //System.out.println(results.getResourceModel());
             //ResultSetFormatter.out(System.out,results, q);
+
             QuerySolution qs = rs.next();
             System.out.println("qs: "+qs);
 
-            Resource subject = qs.getResource(subjectString) ;
 
-            System.out.println("Subject: "+subject.toString()) ;
-            list.add(subject.toString());
+            RDFNode rn = qs.get(subjectString) ;
+
+            if (rn.isLiteral() ) {
+                //String subject = qs.getResource(subjectString).toString();
+                //list.add(subject);
+                Literal literal = qs.getLiteral(subjectString);
+                list.add(literal.toString());
+            }
+            else if (rn.isURIResource() ) {
+                Resource subject = qs.getResource(subjectString);
+                System.out.println("Subject: " + subject.toString());
+                list.add(subject.toString());
+            }
+
         }
-
-        queryRepository.save(query);
-        Result res = this.createResult(list,query).orElseThrow();
-        query.setQueryResultId(res.getId());
-        query.setUniqueUrl("http://localhost:8090/api/queries/details/"+query.getId());
-        queryRepository.save(query);
-
         return list;
     }
 
@@ -135,7 +155,7 @@ public class QueryServiceImpl implements QueryService {
         query.setContent(queryDto.getContent());
         query.setEndpoint(this.endpointRepository.findById(queryDto.getEndpointId())
                 .orElseThrow(
-                    () -> new EndpointNotFoundException(queryDto.getEndpointId())
+                        () -> new EndpointNotFoundException(queryDto.getEndpointId())
                 ));
         queryRepository.save(query);
         return Optional.of(query);
@@ -145,6 +165,8 @@ public class QueryServiceImpl implements QueryService {
     public void deleteById(Long id) {
         this.queryRepository.deleteById(id);
     }
+
+
 
     public Optional<Result> createResult(List<String> list, Query query){
         return this.resultService.save(list.toString(),query.getId(), list);
