@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(schema = "sparql_tool")
-public class Query {
+public class QueryInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,10 +29,10 @@ public class Query {
 
     private String uniqueUrl;
 
-    public Query() {
+    public QueryInfo() {
     }
 
-    public Query(String name, String content, Endpoint endpoint, User user, LocalDateTime timestamp) {
+    public QueryInfo(String name, String content, Endpoint endpoint, User user, LocalDateTime timestamp) {
         this.name = name;
         this.content = content;
         this.endpoint=endpoint;

@@ -2,6 +2,7 @@ package com.finki.sparql_tool_web_app.service;
 
 import com.finki.sparql_tool_web_app.model.DTO.QueryDto;
 import com.finki.sparql_tool_web_app.model.DTO.ResultDto;
+import com.finki.sparql_tool_web_app.model.DTO.ResultGetDto;
 import com.finki.sparql_tool_web_app.model.Result;
 
 import java.util.List;
@@ -13,6 +14,10 @@ public interface ResultService {
     Optional<Result> findById(Long id);
 
     Optional<Result> findByQueryId(Long id);
+
+    Optional<ResultGetDto> findDtoById(Long id);
+
+    Optional<ResultGetDto> findDtoByQueryId(Long id);
 
     List<String> save(ResultDto resultDto);
 

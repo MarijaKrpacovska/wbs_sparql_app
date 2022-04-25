@@ -1,7 +1,6 @@
 package com.finki.sparql_tool_web_app.web;
 
-import com.finki.sparql_tool_web_app.model.DTO.ResultDto;
-import com.finki.sparql_tool_web_app.model.Query;
+import com.finki.sparql_tool_web_app.model.DTO.ResultGetDto;
 import com.finki.sparql_tool_web_app.model.Result;
 import com.finki.sparql_tool_web_app.service.ResultService;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +33,13 @@ public class ResultController {
     @GetMapping("/details/{id}")
     public ResponseEntity<Result> findById(@PathVariable Long id){
         return this.resultService.findById(id)
+                .map(query -> ResponseEntity.ok().body(query))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @GetMapping("/select-result-details/{id}")
+    public ResponseEntity<ResultGetDto> findBySelectResultId(@PathVariable Long id){
+        return this.resultService.findDtoById(id)
                 .map(query -> ResponseEntity.ok().body(query))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }

@@ -1,4 +1,4 @@
-package com.finki.sparql_tool_web_app.model;
+package com.finki.sparql_tool_web_app.model.converters;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,0 +1,44 @@
+Resources:
+https://stackoverflow.com/questions/17766541/saving-and-reusing-the-result-of-a-sparql-queryInfo
+ResultSetFormatter: https://stackoverflow.com/questions/16624777/jena-result-set-to-string
+rs. options (https://stackoverflow.com/questions/67338896/save-a-resultset-to-an-array-in-java)
+
+1. Handle sparql queries:
+
+- Accept all types of queries
+
+- If queryInfo is incorrect and doesn't return result it shouldn't be saved (message)
+
+- proveri za COUNT
+
+- istestiraj za sekakvi tipovi queryInfo
+
+- pogledni controlling prefixes ushte ednash
+
+- QueryParseException: Encountered "<EOF>" at line 1, column 42.
+
+2. Fix JWT auth and add registration (with mail)
+
+- Add register
+
+- Add confirm mail
+
+- Work on the tokens on frontend
+
+3. work on frontend of app
+
+- homepage
+
+- Show queryInfo after execution
+
+- Ako e moe queryInfo na details da vrakja edit, ako e na nekoj drug samo view (mozhe disabled)
+
+- colorful editor
+
+- add copy link of queryInfo
+
+- make queryInfo result link if link
+
+4. error handling & refactor
+
+-session timed out
