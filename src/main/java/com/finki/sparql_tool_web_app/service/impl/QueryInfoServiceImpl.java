@@ -12,9 +12,11 @@ import com.finki.sparql_tool_web_app.repository.QueryInfoRepository;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
 import com.finki.sparql_tool_web_app.service.QueryInfoService;
 import com.finki.sparql_tool_web_app.service.ResultService;
+import org.apache.jena.query.QueryType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,51 +45,6 @@ public class QueryInfoServiceImpl implements QueryInfoService {
         return queryInfoRepository.findById(id);
     }
 
-    /*@Override
-    public Optional<Query> save(QueryDto queryDto) {
-        Endpoint endpoint = endpointRepository.findById(queryDto.getEndpointId()).orElseThrow(() -> new EndpointNotFoundException(queryDto.getEndpointId()));
-        Query query = new Query(queryDto.getName(),
-                queryDto.getContent(),
-                endpoint);
-
-        RDFConnection conn = RDFConnectionFactory.connect(endpoint.getUrl());
-        QueryExecution qExec = conn.query(queryDto.getContent()) ; //SELECT DISTINCT ?s where { [] a ?s } LIMIT 100
-        ResultSet rs = qExec.execSelect() ;
-        while(rs.hasNext()) {
-            QuerySolution qs = rs.next() ;
-            Resource subject = qs.getResource("s") ;
-            System.out.println("Subject: "+subject) ;
-        }
-        qExec.close() ;
-        conn.close() ;
-
-        return Optional.of(queryRepository.save(query));
-    }*/
-
-    /*@Override
-    public List<String> save(QueryDto queryDto) {
-        Endpoint endpoint = endpointRepository.findById(queryDto.getEndpointId()).orElseThrow(() -> new EndpointNotFoundException(queryDto.getEndpointId()));
-        User user = userRepository.findByEmail(queryDto.getUserEmail());
-
-        //  String prefix = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>";
-        QueryInfo queryInfo = new QueryInfo(queryDto.getName(),
-                queryDto.getContent(),
-                endpoint,
-                user,
-                LocalDateTime.now());
-
-        QueryInfo savedQueryInfo = queryInfoRepository.save(queryInfo);
-
-        List<String> list = JenaQueryHandler.getSelectQueryResult(savedQueryInfo);
-        String xmlStr = JenaQueryHandler.getSelectQueryStringResult(savedQueryInfo);
-
-        //Result res = this.createResult(xmlStr,list, queryInfo).orElseThrow();
-        //queryInfo.setQueryResultId(res.getId());
-        queryInfo.setUniqueUrl("http://localhost:8090/api/queries/details/"+ queryInfo.getId());
-        queryInfoRepository.save(queryInfo);
-
-        return list;
-    }*/
 
     @Override
     public List<String> saveOld(QueryDto queryDto) {
@@ -124,57 +81,37 @@ public class QueryInfoServiceImpl implements QueryInfoService {
 
         QueryInfo savedQueryInfo = queryInfoRepository.save(queryInfo);
 
-        List<String> list = JenaQueryHandler.getSelectQueryStringListResult(savedQueryInfo);
-        String xmlStr = JenaQueryHandler.getSelectQueryStringResult(savedQueryInfo);
+        QueryType queryType = JenaQueryHandler.determineQueryType(savedQueryInfo);
+
+        List<String> list = null;
+        String xmlStr = null;
+        if(queryType.equals(QueryType.SELECT)) {
+            list = JenaQueryHandler.getSelectQueryStringListResult(savedQueryInfo);
+            xmlStr = JenaQueryHandler.getSelectQueryStringResult(savedQueryInfo);
+        }
+        else if(queryType.equals(QueryType.DESCRIBE)){
+            list = JenaQueryHandler.getDescribeQueryStringListResult(savedQueryInfo);
+            xmlStr = JenaQueryHandler.getDescribeQueryXMLStringResult(savedQueryInfo);
+        }
+        else if(queryType.equals(QueryType.CONSTRUCT)){
+            list = JenaQueryHandler.getConstructQueryStringListResult(savedQueryInfo);
+            xmlStr = JenaQueryHandler.getConstructQueryXmlStringResult(savedQueryInfo);
+        }
+        else if(queryType.equals(QueryType.ASK)){
+            xmlStr = Boolean.toString(JenaQueryHandler.getAskQueryBooleanResult(savedQueryInfo));
+        }
+        else if(queryType.equals(QueryType.UNKNOWN)){
+            System.out.print("Unknown query type");
+        }
+        else {
+            System.out.print("Can't execute query");
+        }
         queryInfo = this.createResult(xmlStr,list,savedQueryInfo);
         queryInfo.setUniqueUrl("http://localhost:8090/api/queries/details/"+ queryInfo.getId());
         QueryInfo finalQuery = queryInfoRepository.save(queryInfo);
 
         return Optional.of(finalQuery);
     }
-
-    /*public List<String> getResult(QueryInfo queryInfo){
-        Endpoint endpoint = queryInfo.getEndpoint();
-        List<String> list = new ArrayList();
-        RDFConnection conn = RDFConnectionFactory.connect(endpoint.getUrl());
-
-        String subjectString = queryInfo.getContent().split("\\?")[1].split(" ")[0].split("\\R")[0];
-        System.out.println("SUBJECT STRING" + subjectString);
-
-        QueryExecution qExec = conn.query(queryInfo.getContent()) ; //SELECT DISTINCT ?s where { [] a ?s } LIMIT 100
-
-        QueryType queryType = JenaQueryHandler.determineQueryType(queryInfo);
-        QueryType queryType1 = queryType;
-        ResultSet rs = qExec.execSelect() ;
-
-        *//*qExec.close() ;
-        conn.close() ;*//*
-        while (rs.hasNext()) {
-
-            //System.out.println(results.getResourceModel());
-            //ResultSetFormatter.out(System.out,results, q);
-
-            QuerySolution qs = rs.next();
-            System.out.println("qs: "+qs);
-
-            RDFNode rn = qs.get(subjectString) ;
-            System.out.print(qs.varNames());
-            if(rn!= null) {
-                if (rn.isLiteral()) {
-                    //String subject = qs.getResource(subjectString).toString();
-                    //list.add(subject);
-                    Literal literal = qs.getLiteral(subjectString);
-                    list.add(literal.toString());
-                } else if (rn.isURIResource()) {
-                    Resource subject = qs.getResource(subjectString);
-                    System.out.println("Subject: " + subject.toString());
-                    list.add(subject.toString());
-                }
-            }
-
-        }
-        return list;
-    }*/
 
     @Override
     public List<QueryInfo> findAllForUser(Long user) {

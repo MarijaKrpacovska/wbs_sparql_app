@@ -1,8 +1,11 @@
 package com.finki.sparql_tool_web_app.resource.impl;
 
 import com.finki.sparql_tool_web_app.config.JwtTokenProvider;
+import com.finki.sparql_tool_web_app.model.DTO.UserDto;
+import com.finki.sparql_tool_web_app.model.Endpoint;
 import com.finki.sparql_tool_web_app.model.User;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
+import com.finki.sparql_tool_web_app.service.IService;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,6 +35,12 @@ public class UserResourceImpl {
     @Autowired
     private UserRepository userRepository;
 
+    private final IService<User> userIService;
+
+    public UserResourceImpl(IService<User> userIService) {
+        this.userIService = userIService;
+    }
+
     @PostMapping(value = "/authenticate", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> authenticate(@RequestBody User user) {
         log.info("UserResourceImpl : authenticate");
@@ -56,5 +65,12 @@ public class UserResourceImpl {
             return new ResponseEntity<String>(jsonObject.toString(), HttpStatus.UNAUTHORIZED);
         }
         return null;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user){
+        return this.userIService.saveOrUpdate(user)
+                .map(user1 -> ResponseEntity.ok().body(user1))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 }

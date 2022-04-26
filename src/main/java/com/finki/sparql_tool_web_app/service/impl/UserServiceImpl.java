@@ -3,6 +3,7 @@ package com.finki.sparql_tool_web_app.service.impl;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.finki.sparql_tool_web_app.model.DTO.UserDto;
 import com.finki.sparql_tool_web_app.model.User;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
 import com.finki.sparql_tool_web_app.service.IService;
@@ -30,8 +31,8 @@ public class UserServiceImpl implements IService<User> {
     }
 
     @Override
-    public User saveOrUpdate(User user) {
-        return userRepository.saveAndFlush(user);
+    public Optional<User> saveOrUpdate(User user) {
+        return Optional.of(userRepository.saveAndFlush(user));
     }
 
     @Override

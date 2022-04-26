@@ -5,8 +5,6 @@ rs. options (https://stackoverflow.com/questions/67338896/save-a-resultset-to-an
 
 1. Handle sparql queries:
 
-- Accept all types of queries
-
 - If queryInfo is incorrect and doesn't return result it shouldn't be saved (message)
 
 - proveri za COUNT
@@ -42,3 +40,7 @@ rs. options (https://stackoverflow.com/questions/67338896/save-a-resultset-to-an
 4. error handling & refactor
 
 -session timed out
+
+5. add endpoints
+
+6. add add endpoint

@@ -8,7 +8,7 @@ public interface IService<T> {
 
     Optional<T> findById(Long id);
 
-    T saveOrUpdate(T t);
+    Optional<T> saveOrUpdate(T t);
 
     String deleteById(Long id);
 }

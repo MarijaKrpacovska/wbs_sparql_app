@@ -28,8 +28,8 @@ public class RoleServiceImpl implements IService<Role> {
     }
 
     @Override
-    public Role saveOrUpdate(Role role) {
-        return roleRepository.saveAndFlush(role);
+    public Optional<Role> saveOrUpdate(Role role) {
+        return Optional.of(roleRepository.saveAndFlush(role));
     }
 
     @Override
