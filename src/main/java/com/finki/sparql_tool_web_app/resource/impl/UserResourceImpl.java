@@ -2,6 +2,7 @@ package com.finki.sparql_tool_web_app.resource.impl;
 
 import com.finki.sparql_tool_web_app.config.JwtTokenProvider;
 import com.finki.sparql_tool_web_app.model.DTO.UserDto;
+import com.finki.sparql_tool_web_app.model.DTO.UserRegisterDto;
 import com.finki.sparql_tool_web_app.model.Endpoint;
 import com.finki.sparql_tool_web_app.model.User;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
@@ -68,9 +69,9 @@ public class UserResourceImpl {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user){
-        return this.userIService.saveOrUpdate(user)
-                .map(user1 -> ResponseEntity.ok().body(user1))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+    public ResponseEntity register(@RequestBody UserRegisterDto userDto){
+        this.userIService.register(userDto);
+
+        return ResponseEntity.ok().build();
     }
 }

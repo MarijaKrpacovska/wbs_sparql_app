@@ -3,6 +3,7 @@ package com.finki.sparql_tool_web_app.service.impl;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.finki.sparql_tool_web_app.model.DTO.UserRegisterDto;
 import com.finki.sparql_tool_web_app.model.Role;
 import com.finki.sparql_tool_web_app.repository.RoleRepository;
 import com.finki.sparql_tool_web_app.service.IService;
@@ -31,6 +32,12 @@ public class RoleServiceImpl implements IService<Role> {
     public Optional<Role> saveOrUpdate(Role role) {
         return Optional.of(roleRepository.saveAndFlush(role));
     }
+
+    @Override
+    public Optional<Role> register(UserRegisterDto userRegisterDto) {
+        return Optional.empty();
+    }
+
 
     @Override
     public String deleteById(Long id) {

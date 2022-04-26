@@ -21,6 +21,17 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    public User(String name, String email, String mobile, String password, Role role) {
+        this.name = name;
+        this.email = email;
+        this.mobile = mobile;
+        this.password = password;
+        this.role = role;
+    }
+
+    public User() {
+    }
+
     public Long getId() {
         return id;
     }

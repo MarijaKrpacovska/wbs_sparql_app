@@ -68,6 +68,8 @@ public class QueryInfoServiceImpl implements QueryInfoService {
         return list;
     }
 
+    //todo: add QueryType to queryInfo entity
+    //todo: handle invalid queries and saving into DB only when query is valid
     @Override
     public Optional<QueryInfo> save(QueryDto queryDto) {
         Endpoint endpoint = endpointRepository.findById(queryDto.getEndpointId()).orElseThrow(() -> new EndpointNotFoundException(queryDto.getEndpointId()));
