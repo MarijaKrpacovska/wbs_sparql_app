@@ -20,6 +20,7 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+    private Boolean accountVerified;
 
     public User(String name, String email, String mobile, String password, Role role) {
         this.name = name;
@@ -78,6 +79,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setAccountVerified(Boolean verified) {
+        this.accountVerified = verified;
+    }
+
+    public Boolean isAccountVerified(){
+        return accountVerified;
     }
 
 }
