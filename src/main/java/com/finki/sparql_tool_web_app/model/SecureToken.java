@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "secureTokens")
+@Table(name = "secureTokens", schema = "sparql_tool")
 public class SecureToken{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.finki.sparql_tool_web_app.model.DTO.UserRegisterDto;
 import com.finki.sparql_tool_web_app.model.Role;
+import com.finki.sparql_tool_web_app.model.exceptions.InvalidTokenException;
 import com.finki.sparql_tool_web_app.repository.RoleRepository;
 import com.finki.sparql_tool_web_app.service.IService;
 import org.codehaus.jettison.json.JSONException;
@@ -36,6 +37,11 @@ public class RoleServiceImpl implements IService<Role> {
     @Override
     public Optional<Role> register(UserRegisterDto userRegisterDto) {
         return Optional.empty();
+    }
+
+    @Override
+    public boolean verifyUser(String token) throws InvalidTokenException {
+        return false;
     }
 
 

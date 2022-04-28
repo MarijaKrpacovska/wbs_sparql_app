@@ -1,6 +1,7 @@
 package com.finki.sparql_tool_web_app.service.impl;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -9,12 +10,14 @@ import com.finki.sparql_tool_web_app.model.DTO.UserRegisterDto;
 import com.finki.sparql_tool_web_app.model.SecureToken;
 import com.finki.sparql_tool_web_app.model.User;
 import com.finki.sparql_tool_web_app.model.exceptions.InvalidMailAddressException;
+import com.finki.sparql_tool_web_app.model.exceptions.InvalidTokenException;
 import com.finki.sparql_tool_web_app.model.exceptions.PasswordsDontMatchException;
 import com.finki.sparql_tool_web_app.repository.RoleRepository;
 import com.finki.sparql_tool_web_app.repository.SecureTokenRepository;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
 import com.finki.sparql_tool_web_app.service.IService;
 import com.finki.sparql_tool_web_app.service.SecureTokenService;
+import org.apache.commons.codec.binary.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +69,25 @@ public class UserServiceImpl implements IService<User> {
                 .matches();
     }
 
+    @Override
+    public boolean verifyUser(String token) throws InvalidTokenException {
+        SecureToken secureToken = secureTokenService.findByToken(token);
+        if(Objects.isNull(secureToken) || !StringUtils.equals(token, secureToken.getToken()) || secureToken.isExpired()){
+            throw new InvalidTokenException("Token is not valid");
+        }
+        User user = userRepository.getOne(secureToken.getUser().getId());
+        if(Objects.isNull(user)){
+            return false;
+        }
+        user.setAccountVerified(true);
+        userRepository.save(user); // let's same user details
+
+
+        // we don't need invalid password now
+        secureTokenService.removeToken(secureToken);
+        return true;
+    }
+
     public void sendRegistrationEmail(User user){
         SecureToken secureToken = secureTokenService.createSecureToken();
         secureToken.setUser(user);
@@ -98,6 +120,7 @@ public class UserServiceImpl implements IService<User> {
                 userDto.getEmail(),userDto.getMobile(),
                 passwordEncoder.encode(userDto.getPassword()),
                 roleRepository.getById(userDto.getRoleId()));
+        user.setAccountVerified(false);
 
         User savedUser = userRepository.save(user);
         this.sendRegistrationEmail(savedUser);

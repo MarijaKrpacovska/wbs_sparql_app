@@ -5,8 +5,10 @@ import com.finki.sparql_tool_web_app.model.DTO.UserDto;
 import com.finki.sparql_tool_web_app.model.DTO.UserRegisterDto;
 import com.finki.sparql_tool_web_app.model.Endpoint;
 import com.finki.sparql_tool_web_app.model.User;
+import com.finki.sparql_tool_web_app.model.exceptions.InvalidTokenException;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
 import com.finki.sparql_tool_web_app.service.IService;
+import com.finki.sparql_tool_web_app.service.impl.UserServiceImpl;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,6 +38,7 @@ public class UserResourceImpl {
 
     @Autowired
     private UserRepository userRepository;
+
 
     private final IService<User> userIService;
 
@@ -66,6 +70,17 @@ public class UserResourceImpl {
             return new ResponseEntity<String>(jsonObject.toString(), HttpStatus.UNAUTHORIZED);
         }
         return null;
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyCustomer(@RequestParam(required = false) String token){
+
+        try {
+            userIService.verifyUser(token);
+        } catch (InvalidTokenException e) {
+            return new ResponseEntity<String>(e.getMessage(),HttpStatus.OK);
+        }
+        return new ResponseEntity<String>("Successfully validated account",HttpStatus.OK);
     }
 
     @PostMapping("/register")
