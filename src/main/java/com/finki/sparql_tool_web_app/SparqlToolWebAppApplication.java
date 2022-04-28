@@ -25,8 +25,8 @@ public class SparqlToolWebAppApplication implements CommandLineRunner {
         SpringApplication.run(SparqlToolWebAppApplication.class, args);
     }
 
-    @Autowired
-    private EmailSenderService senderService;
+    /*@Autowired
+    private EmailSenderService senderService;*/
 
     @Override
     public void run(String... args) throws Exception {
@@ -52,8 +52,8 @@ public class SparqlToolWebAppApplication implements CommandLineRunner {
         }
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     public void sendEmail(){
         senderService.sendEmail("sparqltool@gmail.com","test","test");
-    }
+    }*/
 }
