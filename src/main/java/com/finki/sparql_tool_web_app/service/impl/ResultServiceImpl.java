@@ -10,6 +10,7 @@ import com.finki.sparql_tool_web_app.model.exceptions.ResultNotFoundException;
 import com.finki.sparql_tool_web_app.repository.QueryInfoRepository;
 import com.finki.sparql_tool_web_app.repository.ResultRepository;
 import com.finki.sparql_tool_web_app.service.ResultService;
+import org.apache.jena.query.QueryType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

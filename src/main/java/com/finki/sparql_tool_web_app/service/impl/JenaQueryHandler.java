@@ -131,26 +131,37 @@ public class JenaQueryHandler {
         Model constructModel = queryExecutionHTTP.execConstruct();
 
         System.out.print("model: ");
-        constructModel.write(System.out);
+        //constructModel.write(System.out);
         RDFList rdflist= constructModel.createList();
 
         StmtIterator iter = constructModel.listStatements();
+
 
         while (iter.hasNext()) {
             Statement stmt      = iter.nextStatement();
             Resource  subject   = stmt.getSubject();
             Property  predicate = stmt.getPredicate();
             RDFNode   object    = stmt.getObject();
+            String resStr="";
 
-            System.out.print(subject.toString());
-            System.out.print(" " + predicate.toString() + " ");
+            System.out.print("subj: "+subject.toString());
+            resStr += subject.toString();
+            resStr += " ";
+            System.out.print("predicate: " + predicate.toString() + " ");
+            resStr += predicate.toString();
+            resStr += " ";
             if (object instanceof Resource) {
-                System.out.print(object.toString());
+                System.out.print("obj res: "+object.toString());
+                resStr += object.toString();
+                resStr += " ";
             } else {
                 // object is a literal
-                System.out.print(" \"" + object.toString() + "\"");
+                System.out.print("obj lit: \"" + object.toString() + "\"");
+                resStr += object.toString();
+                resStr += " ";
             }
             System.out.println(" .");
+            list.add(resStr);
         }
         return list;
     }

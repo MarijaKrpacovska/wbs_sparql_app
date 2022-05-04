@@ -6,6 +6,7 @@ import com.finki.sparql_tool_web_app.model.QueryInfo;
 import com.finki.sparql_tool_web_app.model.Result;
 import com.finki.sparql_tool_web_app.model.User;
 import com.finki.sparql_tool_web_app.model.exceptions.EndpointNotFoundException;
+import com.finki.sparql_tool_web_app.model.exceptions.InvalidQueryException;
 import com.finki.sparql_tool_web_app.model.exceptions.QueryNotFoundException;
 import com.finki.sparql_tool_web_app.repository.EndpointRepository;
 import com.finki.sparql_tool_web_app.repository.QueryInfoRepository;
@@ -55,7 +56,8 @@ public class QueryInfoServiceImpl implements QueryInfoService {
                 queryDto.getContent(),
                 endpoint,
                 user,
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                true);
 
         QueryInfo savedQueryInfo = queryInfoRepository.save(queryInfo);
 
@@ -68,7 +70,6 @@ public class QueryInfoServiceImpl implements QueryInfoService {
         return list;
     }
 
-    //todo: add QueryType to queryInfo entity
     //todo: handle invalid queries and saving into DB only when query is valid
     @Override
     public Optional<QueryInfo> save(QueryDto queryDto) {
@@ -79,34 +80,33 @@ public class QueryInfoServiceImpl implements QueryInfoService {
                 queryDto.getContent(),
                 endpoint,
                 user,
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                true);
 
+        QueryType queryType = JenaQueryHandler.determineQueryType(queryInfo);
+        queryInfo.setQueryType(queryType);
         QueryInfo savedQueryInfo = queryInfoRepository.save(queryInfo);
-
-        QueryType queryType = JenaQueryHandler.determineQueryType(savedQueryInfo);
 
         List<String> list = null;
         String xmlStr = null;
         if(queryType.equals(QueryType.SELECT)) {
-            list = JenaQueryHandler.getSelectQueryStringListResult(savedQueryInfo);
             xmlStr = JenaQueryHandler.getSelectQueryStringResult(savedQueryInfo);
         }
         else if(queryType.equals(QueryType.DESCRIBE)){
-            list = JenaQueryHandler.getDescribeQueryStringListResult(savedQueryInfo);
             xmlStr = JenaQueryHandler.getDescribeQueryXMLStringResult(savedQueryInfo);
         }
         else if(queryType.equals(QueryType.CONSTRUCT)){
-            list = JenaQueryHandler.getConstructQueryStringListResult(savedQueryInfo);
             xmlStr = JenaQueryHandler.getConstructQueryXmlStringResult(savedQueryInfo);
+            list=JenaQueryHandler.getConstructQueryStringListResult(savedQueryInfo);
         }
         else if(queryType.equals(QueryType.ASK)){
             xmlStr = Boolean.toString(JenaQueryHandler.getAskQueryBooleanResult(savedQueryInfo));
         }
         else if(queryType.equals(QueryType.UNKNOWN)){
-            System.out.print("Unknown query type");
+            savedQueryInfo.setValid(false);
         }
         else {
-            System.out.print("Can't execute query");
+            savedQueryInfo.setValid(false);
         }
         queryInfo = this.createResult(xmlStr,list,savedQueryInfo);
         queryInfo.setUniqueUrl("http://localhost:8090/api/queries/details/"+ queryInfo.getId());

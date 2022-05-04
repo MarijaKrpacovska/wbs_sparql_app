@@ -1,7 +1,10 @@
 package com.finki.sparql_tool_web_app.model.DTO;
 
 import lombok.Data;
+import org.apache.jena.query.QueryType;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @Data
@@ -10,6 +13,8 @@ public class QueryDto {
     private String content;
     private Long endpointId;
     private String userEmail;
+
+
 
     public QueryDto() {
     }

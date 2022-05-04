@@ -80,7 +80,7 @@ public class UserResourceImpl {
         } catch (InvalidTokenException e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatus.OK);
         }
-        return new ResponseEntity<String>("Successfully validated account",HttpStatus.OK);
+        return new ResponseEntity<String>("Successfully validated account",HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/register")

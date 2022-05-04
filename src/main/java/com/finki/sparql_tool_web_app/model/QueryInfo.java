@@ -1,6 +1,7 @@
 package com.finki.sparql_tool_web_app.model;
 
 import lombok.Data;
+import org.apache.jena.query.QueryType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -29,15 +30,21 @@ public class QueryInfo {
 
     private String uniqueUrl;
 
+    @Enumerated(EnumType.STRING)
+    QueryType queryType;
+
+    private Boolean valid;
+
     public QueryInfo() {
     }
 
-    public QueryInfo(String name, String content, Endpoint endpoint, User user, LocalDateTime timestamp) {
+    public QueryInfo(String name, String content, Endpoint endpoint, User user, LocalDateTime timestamp, Boolean valid) {
         this.name = name;
         this.content = content;
         this.endpoint=endpoint;
         this.user = user;
         this.timestamp=timestamp;
+        this.valid=valid;
     }
 
 }
