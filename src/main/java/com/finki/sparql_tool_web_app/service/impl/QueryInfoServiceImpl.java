@@ -8,6 +8,7 @@ import com.finki.sparql_tool_web_app.model.User;
 import com.finki.sparql_tool_web_app.model.exceptions.EndpointNotFoundException;
 import com.finki.sparql_tool_web_app.model.exceptions.InvalidQueryException;
 import com.finki.sparql_tool_web_app.model.exceptions.QueryNotFoundException;
+import com.finki.sparql_tool_web_app.model.exceptions.ResultNotFoundException;
 import com.finki.sparql_tool_web_app.repository.EndpointRepository;
 import com.finki.sparql_tool_web_app.repository.QueryInfoRepository;
 import com.finki.sparql_tool_web_app.repository.UserRepository;
@@ -140,6 +141,10 @@ public class QueryInfoServiceImpl implements QueryInfoService {
 
     @Override
     public void deleteById(Long id) {
+        Optional<Result> res = resultService.findByQueryId(id);
+        if(res.isPresent()) {
+            this.resultService.deleteById(res.get().getId());
+        }
         this.queryInfoRepository.deleteById(id);
     }
 

@@ -47,11 +47,20 @@ public class ResultServiceImpl implements ResultService {
     @Override
     public Optional<Result> findByQueryId(Long id) {
         QueryInfo queryInfo = queryInfoRepository.getById(id);
-        Result result = this.resultRepository.findByQueryInfo(queryInfo);
-        String xmlContent = result.getContent();
-        String jsonContent = XmlToJsonConverter.convert(xmlContent);
-        result.setContent(jsonContent);
-        return Optional.of(result);
+        try {
+            Result result = this.resultRepository.findByQueryInfo(queryInfo);
+            if(result!=null) {
+                String xmlContent = result.getContent();
+                String jsonContent = XmlToJsonConverter.convert(xmlContent);
+                result.setContent(jsonContent);
+                return Optional.of(result);
+            }
+            else
+                return Optional.empty();
+        }
+        catch (ResultNotFoundException e){
+            return Optional.empty();
+        }
     }
 
     @Override

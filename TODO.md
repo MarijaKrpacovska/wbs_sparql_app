@@ -29,10 +29,5 @@ To do:
 
 6. AUTH - fix JWT length
 7. Fix added endpoints
-8. remove QueryInfo content list attr
-9. remove unnecessary parts of QueryDto
-10. Admin 
-- add/remove endpoints
-- remove queries
 11. povlechi endpoints ako mozhes
 

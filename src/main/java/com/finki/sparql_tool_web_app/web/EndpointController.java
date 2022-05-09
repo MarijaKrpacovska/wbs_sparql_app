@@ -2,6 +2,7 @@ package com.finki.sparql_tool_web_app.web;
 
 import com.finki.sparql_tool_web_app.model.DTO.EndpointDto;
 import com.finki.sparql_tool_web_app.model.Endpoint;
+import com.finki.sparql_tool_web_app.model.QueryInfo;
 import com.finki.sparql_tool_web_app.service.EndpointService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,13 @@ public class EndpointController {
     @GetMapping
     public List<Endpoint> findAll(){
         return this.endpointService.findAll();
+    }
+
+    @GetMapping("/details/{id}")
+    public ResponseEntity<Endpoint> findEndpointById(@PathVariable Long id){
+        return this.endpointService.findById(id)
+                .map(query -> ResponseEntity.ok().body(query))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PostMapping("/add")
